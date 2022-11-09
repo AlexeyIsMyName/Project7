@@ -9,11 +9,19 @@ import UIKit
 
 class ViewController: UITableViewController {
 
-    var petitions = [String]()
+    var petitions = [Petition]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
+        
+        // let urlString = "https://api.whitehouse.gov/v1/petitions.json?limit=100"
+        let urlString = "https://www.hackingwithswift.com/samples/petitions-1.json"
+        
+        if let url = URL(string: urlString) {
+            if let data = try? Data(contentsOf: url) {
+                // we're OK to parse!
+            }
+        }
     }
 }
 
