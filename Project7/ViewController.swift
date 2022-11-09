@@ -38,7 +38,7 @@ class ViewController: UITableViewController {
         }
     }
     
-    override func numberOfSections(in tableView: UITableView) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return petitions.count
     }
     
@@ -47,6 +47,8 @@ class ViewController: UITableViewController {
         let petition = petitions[indexPath.row]
         cell.textLabel?.text = petition.title
         cell.detailTextLabel?.text = petition.body
+//        cell.textLabel?.text = "Title goes here"
+//        cell.detailTextLabel?.text = "Subtitle goes here"
         return cell
     }
 }
