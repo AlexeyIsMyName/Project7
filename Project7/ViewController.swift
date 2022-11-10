@@ -14,7 +14,7 @@ class ViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // let urlString = "https://api.whitehouse.gov/v1/petitions.json?limit=100"
+//         let urlString = "https://api.whitehouse.gov/v1/petitions.json?limit=100"
         let urlString = "https://www.hackingwithswift.com/samples/petitions-1.json"
         
         DispatchQueue.global().async {
@@ -47,8 +47,12 @@ class ViewController: UITableViewController {
         let petition = petitions[indexPath.row]
         cell.textLabel?.text = petition.title
         cell.detailTextLabel?.text = petition.body
-//        cell.textLabel?.text = "Title goes here"
-//        cell.detailTextLabel?.text = "Subtitle goes here"
         return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let vc = DetailViewController()
+        vc.detailItem = petitions[indexPath.row]
+        navigationController?.pushViewController(vc, animated: true)
     }
 }
