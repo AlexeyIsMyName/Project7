@@ -10,9 +10,20 @@ import UIKit
 class ViewController: UITableViewController {
 
     var petitions = [Petition]()
+    var filteredPetitions = [Petition]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Credits",
+                                                            style: .plain,
+                                                            target: self,
+                                                            action: #selector(showCreditsAlert))
+        
+        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Filter",
+                                                            style: .plain,
+                                                            target: self,
+                                                            action: #selector(showFilterAlert))
         
         let urlString: String
 
@@ -23,9 +34,6 @@ class ViewController: UITableViewController {
             // urlString = "https://api.whitehouse.gov/v1/petitions.json?signatureCountFloor=10000&limit=100"
             urlString = "https://www.hackingwithswift.com/samples/petitions-2.json"
         }
-        
-//         let urlString = "https://api.whitehouse.gov/v1/petitions.json?limit=100"
-//        let urlString = "https://www.hackingwithswift.com/samples/petitions-1.json"
         
 //        DispatchQueue.global().async {
             if let url = URL(string: urlString) {
@@ -40,6 +48,31 @@ class ViewController: UITableViewController {
 //        }
         
         showError()
+    }
+    
+    @objc private func showCreditsAlert() {
+        let ac = UIAlertController(title: "Credits",
+                                   message: "Data comes from the We The People API of the Whitehouse",
+                                   preferredStyle: .alert)
+        ac.addAction(UIAlertAction(title: "OK", style: .default))
+        present(ac, animated: true)
+    }
+    
+    @objc private func showFilterAlert() {
+        let ac = UIAlertController(title: "Filter petitions",
+                                   message: nil,
+                                   preferredStyle: .alert)
+        
+        let action = UIAlertAction(title: "Filter", style: .default) { [self] _ in
+            if let filterText = ac.textFields?.first?.text {
+                self.filteredPetitions = petitions.filter { $0.title.contains(filterText) && $0.body.contains(filterText) }
+                self.tableView.reloadData()
+            }
+        }
+        
+        ac.addAction(action)
+        ac.addTextField()
+        present(ac, animated: true)
     }
     
     func parse(json: Data) {
@@ -61,12 +94,14 @@ class ViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return petitions.count
+        let numberOfRows = filteredPetitions.count > 0 ? filteredPetitions.count : petitions.count
+        print(numberOfRows)
+        return numberOfRows
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
-        let petition = petitions[indexPath.row]
+        let petition = filteredPetitions.count > 0 ? filteredPetitions[indexPath.row] : petitions[indexPath.row]
         cell.textLabel?.text = petition.title
         cell.detailTextLabel?.text = petition.body
         return cell
@@ -74,7 +109,7 @@ class ViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let vc = DetailViewController()
-        vc.detailItem = petitions[indexPath.row]
+        vc.detailItem = filteredPetitions.count > 0 ? filteredPetitions[indexPath.row] : petitions[indexPath.row]
         navigationController?.pushViewController(vc, animated: true)
     }
 }
