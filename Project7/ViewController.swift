@@ -35,19 +35,16 @@ class ViewController: UITableViewController {
             urlString = "https://www.hackingwithswift.com/samples/petitions-2.json"
         }
         
-//        DispatchQueue.global().async {
+        DispatchQueue.global(qos: .userInteractive).async { [weak self] in
             if let url = URL(string: urlString) {
                 if let data = try? Data(contentsOf: url) {
-                    // we're OK to parse!
-//                    DispatchQueue.main.async {
-                        self.parse(json: data)
-                        return
-//                    }
+                    self?.parse(json: data)
+                    return
                 }
             }
-//        }
-        
-        showError()
+            
+            self?.showError()
+        }
     }
     
     @objc private func showCreditsAlert() {
@@ -80,17 +77,21 @@ class ViewController: UITableViewController {
 
         if let jsonPetitions = try? decoder.decode(Petitions.self, from: json) {
             petitions = jsonPetitions.results
-            tableView.reloadData()
+            DispatchQueue.main.async { [weak self] in
+                self?.tableView.reloadData()
+            }
         }
     }
     
     func showError() {
-        let ac = UIAlertController(title: "Loading error",
-                                   message: "There was a problem loading the feed; please check your connection and try again.",
-                                   preferredStyle: .alert)
-        
-        ac.addAction(UIAlertAction(title: "OK", style: .default))
-        present(ac, animated: true)
+        DispatchQueue.main.async {
+            let ac = UIAlertController(title: "Loading error",
+                                       message: "There was a problem loading the feed; please check your connection and try again.",
+                                       preferredStyle: .alert)
+            
+            ac.addAction(UIAlertAction(title: "OK", style: .default))
+            self.present(ac, animated: true)
+        }
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
