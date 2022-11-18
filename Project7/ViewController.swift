@@ -25,6 +25,9 @@ class ViewController: UITableViewController {
                                                             target: self,
                                                             action: #selector(showFilterAlert))
         
+        performSelector(inBackground: #selector(fetchJSON), with: nil)
+        
+        /*
         let urlString: String
 
         if navigationController?.tabBarItem.tag == 0 {
@@ -45,6 +48,7 @@ class ViewController: UITableViewController {
             
             self?.showError()
         }
+        */
     }
     
     @objc private func showCreditsAlert() {
@@ -72,6 +76,7 @@ class ViewController: UITableViewController {
         present(ac, animated: true)
     }
     
+    /*
     func parse(json: Data) {
         let decoder = JSONDecoder()
 
@@ -93,6 +98,7 @@ class ViewController: UITableViewController {
             self.present(ac, animated: true)
         }
     }
+    */
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let numberOfRows = filteredPetitions.count > 0 ? filteredPetitions.count : petitions.count
@@ -113,4 +119,49 @@ class ViewController: UITableViewController {
         vc.detailItem = filteredPetitions.count > 0 ? filteredPetitions[indexPath.row] : petitions[indexPath.row]
         navigationController?.pushViewController(vc, animated: true)
     }
+    
+    // practice with performSelector(inBackground:) and performSelector(onMainThread:)
+    @objc func fetchJSON() {
+        let urlString: String
+
+//        if navigationController?.tabBarItem.tag == 0 {
+//            urlString = "https://api.whitehouse.gov/v1/petitions.json?limit=100"
+//        } else {
+//            urlString = "https://api.whitehouse.gov/v1/petitions.json?signatureCountFloor=10000&limit=100"
+//        }
+        
+        urlString = "https://www.hackingwithswift.com/samples/petitions-1.json"
+        
+        if let url = URL(string: urlString) {
+            if let data = try? Data(contentsOf: url) {
+                parse(json: data)
+                return
+            }
+        }
+
+        performSelector(onMainThread: #selector(showError), with: nil, waitUntilDone: false)
+    }
+    
+    @objc func showError() {
+        let ac = UIAlertController(title: "Loading error",
+                                   message: "There was a problem loading the feed; please check your connection and try again.",
+                                   preferredStyle: .alert)
+        
+        ac.addAction(UIAlertAction(title: "OK", style: .default))
+        present(ac, animated: true)
+    }
+    
+    func parse(json: Data) {
+        let decoder = JSONDecoder()
+
+        print("parsing")
+        
+        if let jsonPetitions = try? decoder.decode(Petitions.self, from: json) {
+            petitions = jsonPetitions.results
+            tableView.performSelector(onMainThread: #selector(UITableView.reloadData), with: nil, waitUntilDone: false)
+        } else {
+            performSelector(onMainThread: #selector(showError), with: nil, waitUntilDone: false)
+        }
+    }
+    
 }
