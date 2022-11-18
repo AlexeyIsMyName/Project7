@@ -25,9 +25,9 @@ class ViewController: UITableViewController {
                                                             target: self,
                                                             action: #selector(showFilterAlert))
         
-        performSelector(inBackground: #selector(fetchJSON), with: nil)
+//        performSelector(inBackground: #selector(fetchJSON), with: nil)
         
-        /*
+        
         let urlString: String
 
         if navigationController?.tabBarItem.tag == 0 {
@@ -48,7 +48,7 @@ class ViewController: UITableViewController {
             
             self?.showError()
         }
-        */
+        
     }
     
     @objc private func showCreditsAlert() {
@@ -76,7 +76,7 @@ class ViewController: UITableViewController {
         present(ac, animated: true)
     }
     
-    /*
+    
     func parse(json: Data) {
         let decoder = JSONDecoder()
 
@@ -98,7 +98,7 @@ class ViewController: UITableViewController {
             self.present(ac, animated: true)
         }
     }
-    */
+    
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let numberOfRows = filteredPetitions.count > 0 ? filteredPetitions.count : petitions.count
@@ -121,6 +121,7 @@ class ViewController: UITableViewController {
     }
     
     // practice with performSelector(inBackground:) and performSelector(onMainThread:)
+    /*
     @objc func fetchJSON() {
         let urlString: String
 
@@ -163,5 +164,5 @@ class ViewController: UITableViewController {
             performSelector(onMainThread: #selector(showError), with: nil, waitUntilDone: false)
         }
     }
-    
+    */
 }
