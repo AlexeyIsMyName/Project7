@@ -64,10 +64,15 @@ class ViewController: UITableViewController {
                                    message: nil,
                                    preferredStyle: .alert)
         
-        let action = UIAlertAction(title: "Filter", style: .default) { [self] _ in
+        let action = UIAlertAction(title: "Filter", style: .default) { [weak self] _ in
             if let filterText = ac.textFields?.first?.text {
-                self.filteredPetitions = petitions.filter { $0.title.contains(filterText) && $0.body.contains(filterText) }
-                self.tableView.reloadData()
+                DispatchQueue.global().async { [weak self] in
+                    guard let self = self else { return }
+                    self.filteredPetitions = self.petitions.filter { $0.title.contains(filterText) && $0.body.contains(filterText) }
+                    DispatchQueue.main.async {
+                        self.tableView.reloadData()
+                    }
+                }
             }
         }
         
